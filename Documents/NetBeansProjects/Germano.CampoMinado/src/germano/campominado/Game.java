@@ -6,7 +6,7 @@ import java.util.Random;
 import javax.swing.JButton;
 
 public class Game extends javax.swing.JFrame {
-
+//pamonha
     MineTile[][] board;
     ArrayList<MineTile> mineList;
     GameSettings gameSettings;
