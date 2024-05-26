@@ -15,6 +15,11 @@ public class GameSettings {
     public int nRows;
     public int nColumns;
     private int nMines;
+
+    public int getnMines() {
+        return nMines;
+    }
+    
     private int nTiles;
     public Difficulty chosenDifficulty;
 

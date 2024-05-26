@@ -1,30 +1,44 @@
 package germano.campominado;
 
 import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.JButton;
 
 public class Game extends javax.swing.JFrame {
-    
+
     MineTile[][] board;
+    ArrayList<MineTile> mineList;
+    GameSettings gameSettings;
 
     public Game(GameSettings gameSettings) {
         board = new MineTile[gameSettings.nRows][gameSettings.nColumns];
+        this.gameSettings = gameSettings;
         initComponents();
         this.setVisible(true);
         for (int row = 0; row < gameSettings.nRows; row++) {
             for (int column = 0; column < gameSettings.nColumns; column++) {
                 MineTile tile = new MineTile(row, column);
                 board[row][column] = tile;
+//                tile.setText("1");
+//                tile.setText("💣");
                 jPanel_board.add(tile);
             }
         }
-//        java.awt.EventQueue.invokeLater(() -> {
-//            System.out.println("Teste");
-//            new Game().setVisible(true);
-//        });
+        setMines(gameSettings.getnMines());
     }
 
-    private class MineTile extends JButton{
+    private void setMines(int nMines) {
+        mineList = new ArrayList<MineTile>();
+        Random random = new Random();
+        try {
+            mineList.add(board[random.nextInt(gameSettings.nRows)][random.nextInt(gameSettings.nColumns)]);
+        } catch (Exception e) {
+        }
+    }
+
+    private class MineTile extends JButton {
+
         int row;
         int column;
 
@@ -32,8 +46,9 @@ public class Game extends javax.swing.JFrame {
             this.row = row;
             this.column = column;
         }
-        
+
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
