@@ -1,12 +1,15 @@
 package germano.campominado;
 
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JButton;
 
 public class Game extends javax.swing.JFrame {
 //pamonha
+
     MineTile[][] board;
     ArrayList<MineTile> mineList;
     GameSettings gameSettings;
@@ -22,6 +25,21 @@ public class Game extends javax.swing.JFrame {
                 board[row][column] = tile;
 //                tile.setText("1");
 //                tile.setText("💣");
+                tile.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        MineTile tile = (MineTile) e.getSource();
+                        
+                        if(e.getButton() == MouseEvent.BUTTON1)
+                        {
+                            if (tile.getText() == "") {
+                                if (mineList.contains(tile)){
+                                    revealMines();
+                                }
+                            }
+                        }
+                    }
+                });
                 jPanel_board.add(tile);
             }
         }
@@ -35,6 +53,10 @@ public class Game extends javax.swing.JFrame {
             mineList.add(board[random.nextInt(gameSettings.nRows)][random.nextInt(gameSettings.nColumns)]);
         } catch (Exception e) {
         }
+    }
+    
+    private void revealMines(){
+        
     }
 
     private class MineTile extends JButton {
