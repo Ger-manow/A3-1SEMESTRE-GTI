@@ -27,7 +27,7 @@ public class MainMenu extends javax.swing.JFrame {
         jLabel_nRows = new javax.swing.JLabel();
         jLabel_nColumns = new javax.swing.JLabel();
         jSpinner_nColumns = new javax.swing.JSpinner();
-        javax.swing.JComboBox<String> jComboBox_Dificulty = new javax.swing.JComboBox<>();
+        jComboBox_Dificulty = new javax.swing.JComboBox<>();
         jLabel_difficulty = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
 
@@ -127,7 +127,8 @@ public class MainMenu extends javax.swing.JFrame {
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
         if ((Integer) jSpinner_nRows.getValue() > 0 & (Integer) jSpinner_nColumns.getValue() > 0) {
             try {
-                gameSettings = new GameSettings((Integer) jSpinner_nRows.getValue(), (Integer) jSpinner_nColumns.getValue(), GameSettings.Difficulty.MEDIUM);
+                gameSettings = new GameSettings((Integer) jSpinner_nRows.getValue(), (Integer) jSpinner_nColumns.getValue(),
+                      GameSettings.Difficulty.values()[jComboBox_Dificulty.getSelectedIndex()] );
                 game = new Game(gameSettings);
                 this.setVisible(false);
             } catch (Exception e) {
@@ -149,6 +150,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private java.awt.Button button1;
+    private javax.swing.JComboBox<String> jComboBox_Dificulty;
     private javax.swing.JLabel jLabel_difficulty;
     private javax.swing.JLabel jLabel_nColumns;
     private javax.swing.JLabel jLabel_nRows;

@@ -5,21 +5,23 @@ import java.util.TimerTask;
 
 public class GameSettings {
 
-    private Timer timer;
-    TimerTask task = new TimerTask() {
-        @Override
-        public void run() {
-        }
-
-    };
     public int nRows;
     public int nColumns;
     private int nMines;
+    private int timePassed = 0;
+
+    public void setTimePassed(int timePassed) {
+        this.timePassed = timePassed;
+    }
+
+    public int getTimePassed() {
+        return timePassed;
+    }
 
     public int getnMines() {
         return nMines;
     }
-    
+
     private int nTiles;
     public Difficulty chosenDifficulty;
 

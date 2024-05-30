@@ -5,39 +5,69 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JButton;
 
 public class Game extends javax.swing.JFrame {
 //pamonha
 
     MineTile[][] board;
+    MineTile tile;
     ArrayList<MineTile> mineList;
     GameSettings gameSettings;
+    Timer timer;
+    TimerTask task;
 
     public Game(GameSettings gameSettings) {
+        // Atribuí valores as variáveis
         board = new MineTile[gameSettings.nRows][gameSettings.nColumns];
         this.gameSettings = gameSettings;
+        timer = new Timer();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                int minutes = Math.floorDiv(gameSettings.getTimePassed(), 60);
+                int seconds = gameSettings.getTimePassed() % 60;
+                jLabel_Timer.setText(String.format("%02d:%02d", minutes, seconds));
+                gameSettings.setTimePassed(gameSettings.getTimePassed() + 1);
+            }
+        };
+
+        // Inicia o "front"
         initComponents();
         this.setVisible(true);
+
+        // Coloquei o timer para iniciar somente após a visibilidade do "front"
+        timer.scheduleAtFixedRate(task, 0, 1000);
+
+        // Monta o tabuleiro
         for (int row = 0; row < gameSettings.nRows; row++) {
             for (int column = 0; column < gameSettings.nColumns; column++) {
-                MineTile tile = new MineTile(row, column);
+                tile = new MineTile(row, column);
                 board[row][column] = tile;
 //                tile.setText("1");
 //                tile.setText("💣");
                 tile.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
-                        MineTile tile = (MineTile) e.getSource();
-                        
-                        if(e.getButton() == MouseEvent.BUTTON1)
-                        {
+                        tile = (MineTile) e.getSource();
+
+                        // Clique esquerdo
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            // Se é um quadro vazio
                             if (tile.getText() == "") {
-                                if (mineList.contains(tile)){
+                                // Se é um quadro que está na lista de bombas
+                                if (mineList.contains(tile)) {
                                     revealMines();
+                                    System.out.println("Game over!");
+                                } // Se é um quadro que não está na lista de bombas
+                                else {
+                                    checkAround(tile);
                                 }
                             }
                         }
+
                     }
                 });
                 jPanel_board.add(tile);
@@ -46,6 +76,7 @@ public class Game extends javax.swing.JFrame {
         setMines(gameSettings.getnMines());
     }
 
+    // Define a posição das bombas no começõ do jogo
     private void setMines(int nMines) {
         mineList = new ArrayList<MineTile>();
         Random random = new Random();
@@ -53,10 +84,45 @@ public class Game extends javax.swing.JFrame {
             mineList.add(board[random.nextInt(gameSettings.nRows)][random.nextInt(gameSettings.nColumns)]);
         } catch (Exception e) {
         }
+        jLabel_MineCounter.setText(String.format("Minas faltantes: %02d", gameSettings.getnMines()));
     }
-    
-    private void revealMines(){
-        
+
+    // Revela a posição das bombas ao clicar em uma
+    private void revealMines() {
+        for (int i = 0; i < mineList.size(); i++) {
+            mineList.get(i).setText("💣");
+        }
+    }
+
+    // Valida ao redor da bomba em caso de acerto
+    private void checkAround(MineTile tile) {
+        tile.setEnabled(false);
+
+        if(countMinesAround(tile) > 0){
+            tile.setText(String.valueOf(countMinesAround(tile)));
+        }
+//        System.out.println(minesFoundAround);
+    }
+
+    private int countMinesAround(MineTile tile) {
+        int n = 0;
+        // Para cada linha superior, atual e inferior
+        for (int row = -1; row <= 1; row++) {
+            // Se a linha tá dentro do range
+            if (row + tile.row >= 0 && row + tile.row < gameSettings.nRows) {
+                // Para cada coluna esquerda, atual e direita
+                for (int column = -1; column <= 1; column++) {
+                    // Se a coluna está dentro do range
+                    if (column + tile.column >= 0 && column + tile.column < gameSettings.nColumns) {
+                        // Valida se este tile está lista de minas
+                        if (mineList.contains(board[row + tile.row][column + tile.column])) {
+                            n += 1;
+                        }
+                    }
+                }
+            }
+        }
+        return n;
     }
 
     private class MineTile extends JButton {
@@ -77,9 +143,9 @@ public class Game extends javax.swing.JFrame {
 
         jPanel_header = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        jLabel_MineCounter = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        jLabel_Timer = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         jSeparator3 = new javax.swing.JSeparator();
@@ -95,13 +161,13 @@ public class Game extends javax.swing.JFrame {
 
         jButton1.setText("Voltar");
 
-        jLabel1.setText("Minas faltantes: XX");
+        jLabel_MineCounter.setText("Minas faltantes: XX");
 
         jLabel2.setText("Tempo corrido:");
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("00:00");
+        jLabel_Timer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel_Timer.setText("00:00");
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
@@ -119,11 +185,11 @@ public class Game extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
+                .addComponent(jLabel_Timer, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
+                .addComponent(jLabel_MineCounter)
                 .addContainerGap())
         );
         jPanel_headerLayout.setVerticalGroup(
@@ -132,9 +198,9 @@ public class Game extends javax.swing.JFrame {
             .addGroup(jPanel_headerLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel_headerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+                    .addComponent(jLabel_MineCounter)
                     .addGroup(jPanel_headerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel3)
+                        .addComponent(jLabel_Timer)
                         .addComponent(jLabel2)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -172,9 +238,9 @@ public class Game extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    public javax.swing.JLabel jLabel_MineCounter;
+    public javax.swing.JLabel jLabel_Timer;
     private javax.swing.JPanel jPanel_board;
     private javax.swing.JPanel jPanel_header;
     private javax.swing.JSeparator jSeparator1;
