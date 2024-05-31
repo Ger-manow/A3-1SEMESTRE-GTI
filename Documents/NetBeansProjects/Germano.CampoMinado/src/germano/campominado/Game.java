@@ -3,10 +3,14 @@ package germano.campominado;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 
 public class Game extends javax.swing.JFrame {
@@ -64,6 +68,7 @@ public class Game extends javax.swing.JFrame {
                                         System.out.println("Game over!");
                                     } // Se é um quadro que não está na lista de bombas
                                     else {
+                                        tile.setEnabled(false);
                                         checkAround(tile);
                                     }
                                 }
@@ -119,12 +124,26 @@ public class Game extends javax.swing.JFrame {
 
     // Valida ao redor da bomba em caso de acerto
     private void checkAround(MineTile tile) {
-        tile.setEnabled(false);
-
         if (countMinesAround(tile) > 0) {
             tile.setText(String.valueOf(countMinesAround(tile)));
+        } else {
+            // Para cada linha superior, atual e inferior
+            for (int row = -1; row <= 1; row++) {
+                // Se a linha tá dentro do range
+                if (row + tile.row >= 0 && row + tile.row < gameSettings.nRows) {
+                    // Para cada coluna esquerda, atual e direita
+                    for (int column = -1; column <= 1; column++) {
+                        // Se a coluna está dentro do range
+                        if (column + tile.column >= 0 && column + tile.column < gameSettings.nColumns) {
+                            if (board[row + tile.row][column + tile.column].isEnabled()) {
+                                board[row + tile.row][column + tile.column].setEnabled(false);
+                                checkAround(board[row + tile.row][column + tile.column]);
+                            }
+                        }
+                    }
+                }
+            }
         }
-//        System.out.println(minesFoundAround);
     }
 
     private int countMinesAround(MineTile tile) {
@@ -157,7 +176,6 @@ public class Game extends javax.swing.JFrame {
             this.row = row;
             this.column = column;
         }
-
     }
 
     @SuppressWarnings("unchecked")
