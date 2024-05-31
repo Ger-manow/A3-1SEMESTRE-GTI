@@ -47,26 +47,42 @@ public class Game extends javax.swing.JFrame {
             for (int column = 0; column < gameSettings.nColumns; column++) {
                 tile = new MineTile(row, column);
                 board[row][column] = tile;
-//                tile.setText("1");
-//                tile.setText("💣");
                 tile.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         tile = (MineTile) e.getSource();
 
-                        // Clique esquerdo
-                        if (e.getButton() == MouseEvent.BUTTON1) {
-                            // Se é um quadro vazio
-                            if (tile.getText() == "") {
-                                // Se é um quadro que está na lista de bombas
-                                if (mineList.contains(tile)) {
-                                    revealMines();
-                                    System.out.println("Game over!");
-                                } // Se é um quadro que não está na lista de bombas
-                                else {
-                                    checkAround(tile);
+                        switch (e.getButton()) {
+                            // Clique esquerdo
+                            case MouseEvent.BUTTON1 -> {
+                                // Se é um quadro vazio
+                                if (tile.getText() == "") {
+                                    // Se é um quadro que está na lista de bombas
+                                    if (mineList.contains(tile)) {
+                                        revealMines();
+                                        task.cancel();
+                                        System.out.println("Game over!");
+                                    } // Se é um quadro que não está na lista de bombas
+                                    else {
+                                        checkAround(tile);
+                                    }
                                 }
                             }
+                            // Clique direito
+                            case MouseEvent.BUTTON3 -> {
+                                if (tile.isEnabled() && tile.getText() != "💣") {
+                                    switch (tile.getText()) {
+                                        case "" ->
+                                            tile.setText("🚩");
+                                        case "🚩" ->
+                                            tile.setText("");
+                                        default ->
+                                            throw new AssertionError();
+                                    }
+                                }
+                            }
+                            default ->
+                                throw new AssertionError();
                         }
 
                     }
@@ -74,13 +90,13 @@ public class Game extends javax.swing.JFrame {
                 jPanel_board.add(tile);
             }
         }
-        
+
         setMines();
     }
 
     // Define a posição das bombas no começõ do jogo
     private void setMines() {
-        mineList = new ArrayList<MineTile>();
+        mineList = new ArrayList<>();
         Random random = new Random();
         int rowPosition;
         int columnPosition;
