@@ -18,6 +18,7 @@ public class Game extends javax.swing.JFrame {
     GameSettings gameSettings;
     Timer timer;
     TimerTask task;
+    MainMenu mainMenu;
 
     public Game(GameSettings gameSettings) {
         // Atribuí valores as variáveis
@@ -73,16 +74,22 @@ public class Game extends javax.swing.JFrame {
                 jPanel_board.add(tile);
             }
         }
-        setMines(gameSettings.getnMines());
+        
+        setMines();
     }
 
     // Define a posição das bombas no começõ do jogo
-    private void setMines(int nMines) {
+    private void setMines() {
         mineList = new ArrayList<MineTile>();
         Random random = new Random();
-        try {
-            mineList.add(board[random.nextInt(gameSettings.nRows)][random.nextInt(gameSettings.nColumns)]);
-        } catch (Exception e) {
+        int rowPosition;
+        int columnPosition;
+        while (mineList.size() < gameSettings.getnMines()) {
+            rowPosition = random.nextInt(gameSettings.nRows);
+            columnPosition = random.nextInt(gameSettings.nColumns);
+            if (!mineList.contains(board[rowPosition][columnPosition])) {
+                mineList.add(board[rowPosition][columnPosition]);
+            }
         }
         jLabel_MineCounter.setText(String.format("Minas faltantes: %02d", gameSettings.getnMines()));
     }
@@ -98,7 +105,7 @@ public class Game extends javax.swing.JFrame {
     private void checkAround(MineTile tile) {
         tile.setEnabled(false);
 
-        if(countMinesAround(tile) > 0){
+        if (countMinesAround(tile) > 0) {
             tile.setText(String.valueOf(countMinesAround(tile)));
         }
 //        System.out.println(minesFoundAround);
@@ -152,6 +159,7 @@ public class Game extends javax.swing.JFrame {
         jPanel_board = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Projeto A3 - Campo minado");
         setBackground(javax.swing.UIManager.getDefaults().getColor("nb.multitabs.background"));
         setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
         setResizable(false);
@@ -160,6 +168,11 @@ public class Game extends javax.swing.JFrame {
         jPanel_header.setBackground(javax.swing.UIManager.getDefaults().getColor("Actions.Blue"));
 
         jButton1.setText("Voltar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel_MineCounter.setText("Minas faltantes: XX");
 
@@ -235,6 +248,12 @@ public class Game extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        mainMenu = new MainMenu();
+        this.setVisible(false);
+        mainMenu.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

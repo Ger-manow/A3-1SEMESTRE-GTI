@@ -32,6 +32,7 @@ public class MainMenu extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Projeto A3");
 
         button1.setLabel("button1");
         button1.addActionListener(new java.awt.event.ActionListener() {
