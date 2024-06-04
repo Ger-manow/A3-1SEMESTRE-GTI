@@ -1,16 +1,13 @@
 package germano.campominado;
 
+import germano.sounds.SoundController;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 
 public class Game extends javax.swing.JFrame {
@@ -23,11 +20,13 @@ public class Game extends javax.swing.JFrame {
     Timer timer;
     TimerTask task;
     MainMenu mainMenu;
+    SoundController soundController;
 
     public Game(GameSettings gameSettings) {
         // Atribuí valores as variáveis
         board = new MineTile[gameSettings.nRows][gameSettings.nColumns];
         this.gameSettings = gameSettings;
+        soundController = new SoundController();
         timer = new Timer();
         task = new TimerTask() {
             @Override
@@ -63,11 +62,13 @@ public class Game extends javax.swing.JFrame {
                                 if (tile.getText() == "") {
                                     // Se é um quadro que está na lista de bombas
                                     if (mineList.contains(tile)) {
+                                        soundController.playExplosionSound();
                                         revealMines();
                                         task.cancel();
                                         System.out.println("Game over!");
                                     } // Se é um quadro que não está na lista de bombas
                                     else {
+                                        soundController.playRegularClickSound();
                                         tile.setEnabled(false);
                                         checkAround(tile);
                                     }

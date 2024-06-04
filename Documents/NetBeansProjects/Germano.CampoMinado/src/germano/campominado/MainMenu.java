@@ -3,18 +3,17 @@ package germano.campominado;
 import java.util.Arrays;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import germano.sounds.SoundController;
 
-/**
- *
- * @author Germano
- */
 public class MainMenu extends javax.swing.JFrame {
 
     public static Game game;
     public static GameSettings gameSettings;
+    public static SoundController soundController;
 
     public MainMenu() {
         initComponents();
+        soundController = new SoundController();
     }
 
     @SuppressWarnings("unchecked")
