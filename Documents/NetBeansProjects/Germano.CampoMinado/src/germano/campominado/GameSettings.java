@@ -10,6 +10,8 @@ public class GameSettings {
     private int nMines;
     private int timePassed = 0;
     private UUID gameUuid;
+    private String playerName;
+    private int score = 0;
     private int nTiles;
     public Difficulty chosenDifficulty;
 
@@ -59,5 +61,17 @@ public class GameSettings {
 
     public UUID getGameUuid() {
         return gameUuid;
+    }
+
+    public void setScore() {
+        this.score += 1;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 }

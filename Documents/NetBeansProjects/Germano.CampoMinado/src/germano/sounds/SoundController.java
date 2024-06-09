@@ -32,7 +32,10 @@ public class SoundController {
     }
 
     public void playRegularClickSound() {
-        clickSoundClip.loop(1); // Play in a loop
+        if (clickSoundClip.isRunning()) {
+        } else {
+            clickSoundClip.start();
+        }
     }
 
     public void playExplosionSound() {

@@ -1,7 +1,10 @@
 package germano.campominado;
 
 import germano.sounds.SoundController;
+import java.awt.Color;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -9,6 +12,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 public class Game extends javax.swing.JFrame {
 //pamonha
@@ -21,11 +25,16 @@ public class Game extends javax.swing.JFrame {
     TimerTask task;
     MainMenu mainMenu;
     SoundController soundController;
+    ScoreManager scoreManager;
+    JOptionPane jpane;
 
-    public Game(GameSettings gameSettings) {
+    public Game(GameSettings gameSettings, ScoreManager scoreManager) {
         // Atribuí valores as variáveis
         board = new MineTile[gameSettings.nRows][gameSettings.nColumns];
         this.gameSettings = gameSettings;
+        this.scoreManager = scoreManager;
+        jpane = new JOptionPane();
+        Object[] options = {"Jogar Novamente", "Placar", "Cancelar"};
         soundController = new SoundController();
         timer = new Timer();
         task = new TimerTask() {
@@ -65,16 +74,47 @@ public class Game extends javax.swing.JFrame {
                                         soundController.playExplosionSound();
                                         revealMines();
                                         task.cancel();
-                                        System.out.println("Game over!");
+                                        gameSettings.setGameOver();
+                                        while (true) {
+                                            String n = null;
+                                            try {
+                                                n = jpane.showInputDialog(null,
+                                                        "Você perdeu."
+                                                        + "\nPontuação: " + gameSettings.getScore()
+                                                        + "\nJogador, qual seu nome?",
+                                                        "Game Over!",
+                                                        MessageType.NONE.ordinal());
+                                                System.out.println("N:" + n);
+                                                if (n == null) {
+                                                    throw new Exception();
+                                                } else {
+                                                    gameSettings.setPlayerName(n);
+                                                    break;
+                                                }
+                                            } catch (Exception x) {
+                                                System.out.println("Valor inválido");
+                                            }
+
+                                        }
+
+                                        jpane.showOptionDialog(null,
+                                                "Deseja jogar novamente ou ir para o placar?",
+                                                "Jogo Finalizado",
+                                                JOptionPane.YES_NO_CANCEL_OPTION,
+                                                JOptionPane.QUESTION_MESSAGE,
+                                                null,
+                                                options,
+                                                options[0]);
+                                        scoreManager.addGame(gameSettings);
                                     } // Se é um quadro que não está na lista de bombas
                                     else {
-                                        soundController.playRegularClickSound();
                                         tile.setEnabled(false);
                                         checkAround(tile);
                                     }
                                 }
                             }
                             // Clique direito
+
                             case MouseEvent.BUTTON3 -> {
                                 if (tile.isEnabled() && tile.getText() != "💣") {
                                     switch (tile.getText()) {
@@ -99,8 +139,8 @@ public class Game extends javax.swing.JFrame {
 
         setMines();
     }
-
     // Define a posição das bombas no começõ do jogo
+
     private void setMines() {
         mineList = new ArrayList<>();
         Random random = new Random();
@@ -125,6 +165,8 @@ public class Game extends javax.swing.JFrame {
 
     // Valida ao redor da bomba em caso de acerto
     private void checkAround(MineTile tile) {
+        soundController.playRegularClickSound();
+        gameSettings.setScore();
         if (countMinesAround(tile) > 0) {
             tile.setText(String.valueOf(countMinesAround(tile)));
         } else {

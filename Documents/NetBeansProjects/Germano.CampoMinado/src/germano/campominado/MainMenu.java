@@ -10,10 +10,12 @@ public class MainMenu extends javax.swing.JFrame {
     public static Game game;
     public static GameSettings gameSettings;
     public static SoundController soundController;
+    public static ScoreManager scoreManager;
 
     public MainMenu() {
         initComponents();
         soundController = new SoundController();
+        scoreManager = new ScoreManager();
     }
 
     @SuppressWarnings("unchecked")
@@ -144,7 +146,7 @@ public class MainMenu extends javax.swing.JFrame {
             try {
                 gameSettings = new GameSettings((Integer) jSpinner_nRows.getValue(), (Integer) jSpinner_nColumns.getValue(),
                       GameSettings.Difficulty.values()[jComboBox_Dificulty.getSelectedIndex()] );
-                game = new Game(gameSettings);
+                game = new Game(gameSettings, scoreManager);
                 this.setVisible(false);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
