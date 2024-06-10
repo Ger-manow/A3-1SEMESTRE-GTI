@@ -7,6 +7,7 @@ public class GameSettings {
     public int nRows;
     public int nColumns;
     boolean gameOver;
+    boolean gameWon;
     private int nMines;
     private int timePassed = 0;
     private UUID gameUuid;
@@ -45,6 +46,10 @@ public class GameSettings {
 
     public void setGameOver() {
         this.gameOver = true;
+    }
+    
+    public void setGameWon(){
+        this.gameWon = true;
     }
 
     public void setTimePassed(int timePassed) {

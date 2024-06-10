@@ -2,8 +2,8 @@ package germano.campominado;
 
 import germano.sounds.SoundController;
 import java.awt.Color;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
-import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -162,57 +162,17 @@ public class Game extends javax.swing.JFrame {
                                     revealMines();
                                     task.cancel();
                                     gameSettings.setGameOver();
-                                    while (true) {
-                                        String n = null;
-                                        try {
-                                            n = jpane.showInputDialog(null,
-                                                    "Você perdeu."
-                                                    + "\nPontuação: " + gameSettings.getScore()
-                                                    + "\nJogador, qual seu nome?",
-                                                    "Game Over!",
-                                                    MessageType.NONE.ordinal());
-                                            if (n == null) {
-                                                throw new Exception();
-                                            } else {
-                                                gameSettings.setPlayerName(n);
-                                                break;
-                                            }
-                                        } catch (Exception x) {
-                                            jpane.showMessageDialog(null, "Valor inválido.");
-                                        }
-
-                                    }
-
-                                    int choice = jpane.showOptionDialog(null,
-                                            "Deseja acessar o placar ou jogar novamente?",
-                                            "Game Over!",
-                                            JOptionPane.DEFAULT_OPTION,
-                                            JOptionPane.QUESTION_MESSAGE,
-                                            null,
-                                            options,
-                                            options[1]);
-                                    scoreManager.addGame(gameSettings);
-
-                                    switch (choice) {
-                                        case 0 -> {
-                                            jpane.showMessageDialog(null, "Menu de placar em construção!");
-                                            returnMainMenu();
-                                        }
-                                        case 1 -> {
-                                            returnMainMenu();
-                                        }
-                                        default ->
-                                            throw new AssertionError();
-                                    }
+                                    setGameFinished(false);
                                 } // Se é um quadro que não está na lista de bombas
                                 else {
                                     tile.setEnabled(false);
                                     checkAround(tile);
+                                    validateVictory();
                                 }
                             }
                         }
-                        // Clique direito
 
+                        // Clique direito
                         case MouseEvent.BUTTON3 -> {
                             if (tile.isEnabled() && tile.getText() != "💣") {
                                 switch (tile.getText()) {
@@ -223,13 +183,14 @@ public class Game extends javax.swing.JFrame {
                                     default ->
                                         throw new AssertionError();
                                 }
+                                validateVictory();
                             }
                         }
                         default ->
                             throw new AssertionError();
                     }
-
                 }
+
             });
         }
 
@@ -239,6 +200,82 @@ public class Game extends javax.swing.JFrame {
         mainMenu = new MainMenu();
         this.setVisible(false);
         mainMenu.setVisible(true);
+    }
+
+    // Valida vitória
+    private void validateVictory() {
+        if (gameSettings.getScore() >= (gameSettings.nColumns * gameSettings.nRows) - gameSettings.getnMines()) {
+            gameSettings.setGameWon();
+            setGameFinished(true);
+        }
+    }
+
+    private void setGameFinished(boolean isGameWon) throws HeadlessException, AssertionError {
+        if (isGameWon == true) {
+            while (true) {
+                String n;
+                try {
+                    n = jpane.showInputDialog(null,
+                            "Você ganhou!"
+                            + "\nPontuação: " + gameSettings.getScore()
+                            + "\nJogador, qual seu nome?",
+                            "Partida concluída",
+                            MessageType.NONE.ordinal());
+                    if (n == null) {
+                        throw new Exception();
+                    } else {
+                        gameSettings.setPlayerName(n);
+                        break;
+                    }
+                } catch (Exception x) {
+                    jpane.showMessageDialog(null, "Valor inválido.");
+                }
+
+            }
+        } else {
+            while (true) {
+                String n;
+                try {
+                    n = jpane.showInputDialog(null,
+                            "Você perdeu!"
+                            + "\nPontuação: " + gameSettings.getScore()
+                            + "\nJogador, qual seu nome?",
+                            "Partida concluída",
+                            MessageType.NONE.ordinal());
+                    if (n == null) {
+                        throw new Exception();
+                    } else {
+                        gameSettings.setPlayerName(n);
+                        break;
+                    }
+                } catch (Exception x) {
+                    jpane.showMessageDialog(null, "Valor inválido.");
+                }
+
+            }
+        }
+
+        int choice = jpane.showOptionDialog(null,
+                "Deseja acessar o placar ou jogar novamente?",
+                "Partida concluída!",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[1]);
+        scoreManager.addGame(gameSettings);
+
+        switch (choice) {
+            case 0 -> {
+                jpane.showMessageDialog(null, "Menu de placar em construção!");
+                returnMainMenu();
+            }
+            case 1 -> {
+                returnMainMenu();
+            }
+            default ->
+                throw new AssertionError();
+        }
     }
 
     @SuppressWarnings("unchecked")
