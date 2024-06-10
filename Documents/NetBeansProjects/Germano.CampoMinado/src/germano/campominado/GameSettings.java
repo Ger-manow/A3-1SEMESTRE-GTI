@@ -75,6 +75,10 @@ public class GameSettings {
     public int getScore() {
         return score;
     }
+    
+    public int getNtiles(){
+        return this.nTiles;
+    }
 
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
