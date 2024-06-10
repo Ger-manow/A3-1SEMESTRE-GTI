@@ -4,3 +4,4 @@
 - Emilly Silva de Oliveira - 12524133414
 - Bernardo Zanella Pereira - 12524149540
 - Wenderson Da Silva Santos - 12524143329
+- Gustavo dos Santos Barboza - 12524126567
