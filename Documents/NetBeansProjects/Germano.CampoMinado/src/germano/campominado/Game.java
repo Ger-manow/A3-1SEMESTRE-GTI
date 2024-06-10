@@ -204,7 +204,7 @@ public class Game extends javax.swing.JFrame {
 
     // Valida vitória
     private void validateVictory() {
-        if (gameSettings.getScore() >= (gameSettings.nColumns * gameSettings.nRows) - gameSettings.getnMines()) {
+        if (gameSettings.getScore() >= (gameSettings.getNtiles()) - gameSettings.getnMines()) {
             gameSettings.setGameWon();
             setGameFinished(true);
         }
