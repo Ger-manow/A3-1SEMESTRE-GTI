@@ -5,3 +5,5 @@
 - Bernardo Zanella Pereira - 12524149540
 - Wenderson Da Silva Santos - 12524143329
 - Gustavo dos Santos Barboza - 12524126567
+
+https://docs.google.com/document/d/19iJwPrED491N8ryxRM0ByNg6bDfiWGhh6CNRotpUoNg/edit?usp=sharing
