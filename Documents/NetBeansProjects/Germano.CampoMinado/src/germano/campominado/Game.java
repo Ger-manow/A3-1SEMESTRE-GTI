@@ -15,18 +15,18 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 public class Game extends javax.swing.JFrame {
-//pamonha
 
-    MineTile[][] board;
-    MineTile tile;
-    ArrayList<MineTile> mineList;
-    GameSettings gameSettings;
-    Timer timer;
-    TimerTask task;
-    MainMenu mainMenu;
-    SoundController soundController;
-    ScoreManager scoreManager;
-    JOptionPane jpane;
+    MineTile[][] board;                 // Matriz com 2 dimensões para posicionamento dos botões
+    MineTile tile;                      // Botão
+    ArrayList<MineTile> mineList;       // Lista de minas(Quantidade flexível de valores)
+    GameSettings gameSettings;          // Configurações do jogo
+    Timer timer;                        // Cronômetro
+    TimerTask task;                     // Tarefa que será executada no cronômetro
+    MainMenu mainMenu;                  // Referência ao menu principal
+    SoundController soundController;    // Controladora de audio
+    ScoreManager scoreManager;          // Controladora de placar
+    JOptionPane jpane;                  // Menus
+    Object[] options = {"Placar", "Jogar novamente"}; // Opções do menu
 
     public Game(GameSettings gameSettings, ScoreManager scoreManager) {
         // Atribuí valores as variáveis
@@ -34,7 +34,6 @@ public class Game extends javax.swing.JFrame {
         this.gameSettings = gameSettings;
         this.scoreManager = scoreManager;
         jpane = new JOptionPane();
-        Object[] options = {"Jogar Novamente", "Placar", "Cancelar"};
         soundController = new SoundController();
         timer = new Timer();
         task = new TimerTask() {
@@ -59,88 +58,14 @@ public class Game extends javax.swing.JFrame {
             for (int column = 0; column < gameSettings.nColumns; column++) {
                 tile = new MineTile(row, column);
                 board[row][column] = tile;
-                tile.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        tile = (MineTile) e.getSource();
-
-                        switch (e.getButton()) {
-                            // Clique esquerdo
-                            case MouseEvent.BUTTON1 -> {
-                                // Se é um quadro vazio
-                                if (tile.getText() == "") {
-                                    // Se é um quadro que está na lista de bombas
-                                    if (mineList.contains(tile)) {
-                                        soundController.playExplosionSound();
-                                        revealMines();
-                                        task.cancel();
-                                        gameSettings.setGameOver();
-                                        while (true) {
-                                            String n = null;
-                                            try {
-                                                n = jpane.showInputDialog(null,
-                                                        "Você perdeu."
-                                                        + "\nPontuação: " + gameSettings.getScore()
-                                                        + "\nJogador, qual seu nome?",
-                                                        "Game Over!",
-                                                        MessageType.NONE.ordinal());
-                                                System.out.println("N:" + n);
-                                                if (n == null) {
-                                                    throw new Exception();
-                                                } else {
-                                                    gameSettings.setPlayerName(n);
-                                                    break;
-                                                }
-                                            } catch (Exception x) {
-                                                System.out.println("Valor inválido");
-                                            }
-
-                                        }
-
-                                        jpane.showOptionDialog(null,
-                                                "Deseja jogar novamente ou ir para o placar?",
-                                                "Jogo Finalizado",
-                                                JOptionPane.YES_NO_CANCEL_OPTION,
-                                                JOptionPane.QUESTION_MESSAGE,
-                                                null,
-                                                options,
-                                                options[0]);
-                                        scoreManager.addGame(gameSettings);
-                                    } // Se é um quadro que não está na lista de bombas
-                                    else {
-                                        tile.setEnabled(false);
-                                        checkAround(tile);
-                                    }
-                                }
-                            }
-                            // Clique direito
-
-                            case MouseEvent.BUTTON3 -> {
-                                if (tile.isEnabled() && tile.getText() != "💣") {
-                                    switch (tile.getText()) {
-                                        case "" ->
-                                            tile.setText("🚩");
-                                        case "🚩" ->
-                                            tile.setText("");
-                                        default ->
-                                            throw new AssertionError();
-                                    }
-                                }
-                            }
-                            default ->
-                                throw new AssertionError();
-                        }
-
-                    }
-                });
                 jPanel_board.add(tile);
             }
         }
 
         setMines();
     }
-    // Define a posição das bombas no começõ do jogo
 
+    // Define a posição das bombas no começõ do jogo
     private void setMines() {
         mineList = new ArrayList<>();
         Random random = new Random();
@@ -160,6 +85,7 @@ public class Game extends javax.swing.JFrame {
     private void revealMines() {
         for (int i = 0; i < mineList.size(); i++) {
             mineList.get(i).setText("💣");
+            mineList.get(i).setForeground(Color.red);
         }
     }
 
@@ -189,6 +115,7 @@ public class Game extends javax.swing.JFrame {
         }
     }
 
+    // Conta a quantidade de minas ao redor
     private int countMinesAround(MineTile tile) {
         int n = 0;
         // Para cada linha superior, atual e inferior
@@ -210,6 +137,7 @@ public class Game extends javax.swing.JFrame {
         return n;
     }
 
+    // Classe do botão
     private class MineTile extends JButton {
 
         int row;
@@ -218,7 +146,99 @@ public class Game extends javax.swing.JFrame {
         public MineTile(int row, int column) {
             this.row = row;
             this.column = column;
+            this.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    tile = (MineTile) e.getSource();
+
+                    switch (e.getButton()) {
+                        // Clique esquerdo
+                        case MouseEvent.BUTTON1 -> {
+                            // Se é um quadro vazio
+                            if (tile.getText() == "") {
+                                // Se é um quadro que está na lista de bombas
+                                if (mineList.contains(tile)) {
+                                    soundController.playExplosionSound();
+                                    revealMines();
+                                    task.cancel();
+                                    gameSettings.setGameOver();
+                                    while (true) {
+                                        String n = null;
+                                        try {
+                                            n = jpane.showInputDialog(null,
+                                                    "Você perdeu."
+                                                    + "\nPontuação: " + gameSettings.getScore()
+                                                    + "\nJogador, qual seu nome?",
+                                                    "Game Over!",
+                                                    MessageType.NONE.ordinal());
+                                            if (n == null) {
+                                                throw new Exception();
+                                            } else {
+                                                gameSettings.setPlayerName(n);
+                                                break;
+                                            }
+                                        } catch (Exception x) {
+                                            jpane.showMessageDialog(null, "Valor inválido.");
+                                        }
+
+                                    }
+
+                                    int choice = jpane.showOptionDialog(null,
+                                            "Deseja acessar o placar ou jogar novamente?",
+                                            "Game Over!",
+                                            JOptionPane.DEFAULT_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE,
+                                            null,
+                                            options,
+                                            options[1]);
+                                    scoreManager.addGame(gameSettings);
+
+                                    switch (choice) {
+                                        case 0 -> {
+                                            jpane.showMessageDialog(null, "Menu de placar em construção!");
+                                            returnMainMenu();
+                                        }
+                                        case 1 -> {
+                                            returnMainMenu();
+                                        }
+                                        default ->
+                                            throw new AssertionError();
+                                    }
+                                } // Se é um quadro que não está na lista de bombas
+                                else {
+                                    tile.setEnabled(false);
+                                    checkAround(tile);
+                                }
+                            }
+                        }
+                        // Clique direito
+
+                        case MouseEvent.BUTTON3 -> {
+                            if (tile.isEnabled() && tile.getText() != "💣") {
+                                switch (tile.getText()) {
+                                    case "" ->
+                                        tile.setText("🚩");
+                                    case "🚩" ->
+                                        tile.setText("");
+                                    default ->
+                                        throw new AssertionError();
+                                }
+                            }
+                        }
+                        default ->
+                            throw new AssertionError();
+                    }
+
+                }
+            });
         }
+
+    }
+
+    private void returnMainMenu() {
+        mainMenu = new MainMenu();
+        this.setVisible(false);
+        mainMenu.setVisible(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -327,9 +347,7 @@ public class Game extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        mainMenu = new MainMenu();
-        this.setVisible(false);
-        mainMenu.setVisible(true);
+        returnMainMenu();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

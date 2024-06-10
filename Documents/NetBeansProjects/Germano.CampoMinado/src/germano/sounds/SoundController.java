@@ -20,8 +20,6 @@ public class SoundController {
         try {
             clickSoundClip = AudioSystem.getClip();
             explosionSoundClip = AudioSystem.getClip();
-//            clickSoundFile = new File(getClass().getResource("clickSound.wav").getFile());
-//            explosionSoundFile = new File(getClass().getResource("explosionSound.wav").getFile());
             clickAudioInputStream = AudioSystem.getAudioInputStream(getClass().getResource("clickSound.wav"));
             clickSoundClip.open(clickAudioInputStream);
             explosionAudioInputStream = AudioSystem.getAudioInputStream(getClass().getResource("explosionSound.wav"));
